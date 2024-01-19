@@ -16,24 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef TOPIC_METADATA_HPP_
-#define TOPIC_METADATA_HPP_
+#pragma once
 
-#include <pulsar/defines.h>
+#include <pulsar/Schema.h>
+#include <google/protobuf/descriptor.h>
 
 namespace pulsar {
+
 /**
- * Metadata of a topic that can be used for message routing.
+ * Create a protobuf native schema using a descriptor.
+ *
+ * @param descriptor the Descriptor object of the target class
+ * @return the protobuf native schema
+ * @throw std::invalid_argument if descriptor is nullptr
  */
-class PULSAR_PUBLIC TopicMetadata {
-   public:
-    virtual ~TopicMetadata() {}
+PULSAR_PUBLIC SchemaInfo createProtobufNativeSchema(const google::protobuf::Descriptor* descriptor);
 
-    /**
-     * @return the number of partitions
-     */
-    virtual int getNumPartitions() const = 0;
-};
 }  // namespace pulsar
-
-#endif /* TOPIC_METADATA_HPP_ */

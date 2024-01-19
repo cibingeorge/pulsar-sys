@@ -1,6 +1,6 @@
 [package]
 name = "pulsar-sys"
-version = "2.7.0"
+version = "2.10.0"
 authors = ["Alan Hoffmeister <alanhoffmeister@gmail.com>"]
 edition = "2018"
 readme = "README.md"
@@ -16,4 +16,4 @@ homepage = "https://github.com/alanhoff/pulsar-sys"
 [dependencies]
 
 [build-dependencies]
-bindgen = "0.55.1"
+bindgen = "0.69.2"

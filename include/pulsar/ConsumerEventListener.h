@@ -16,24 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef TOPIC_METADATA_HPP_
-#define TOPIC_METADATA_HPP_
+#ifndef PULSAR_CONSUMEREVENTLISTENER_H_
+#define PULSAR_CONSUMEREVENTLISTENER_H_
 
 #include <pulsar/defines.h>
 
 namespace pulsar {
-/**
- * Metadata of a topic that can be used for message routing.
- */
-class PULSAR_PUBLIC TopicMetadata {
+
+class Consumer;
+
+class PULSAR_PUBLIC ConsumerEventListener {
    public:
-    virtual ~TopicMetadata() {}
+    virtual ~ConsumerEventListener(){};
+    /**
+     * @brief Notified when the consumer group is changed, and the consumer becomes active.
+     *
+     * @param consumer the consumer that originated the event
+     * @param partitionId the id of the partition that beconmes active.
+     */
+    virtual void becameActive(Consumer consumer, int partitionId) = 0;
 
     /**
-     * @return the number of partitions
+     * @brief Notified when the consumer group is changed, and the consumer is still inactive or becomes
+     * inactive.
+     *
+     * @param consumer the consumer that originated the event
+     * @param partitionId the id of the partition that is still inactive or becomes inactive.
      */
-    virtual int getNumPartitions() const = 0;
+    virtual void becameInactive(Consumer consumer, int partitionId) = 0;
 };
 }  // namespace pulsar
-
-#endif /* TOPIC_METADATA_HPP_ */
+#endif /* PULSAR_CONSUMEREVENTLISTENER_H_ */

@@ -16,24 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef TOPIC_METADATA_HPP_
-#define TOPIC_METADATA_HPP_
 
-#include <pulsar/defines.h>
+#pragma once
 
-namespace pulsar {
-/**
- * Metadata of a topic that can be used for message routing.
- */
-class PULSAR_PUBLIC TopicMetadata {
-   public:
-    virtual ~TopicMetadata() {}
-
-    /**
-     * @return the number of partitions
-     */
-    virtual int getNumPartitions() const = 0;
-};
-}  // namespace pulsar
-
-#endif /* TOPIC_METADATA_HPP_ */
+#include <pulsar/Version.h>
