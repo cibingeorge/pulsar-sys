@@ -16,20 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#pragma once
+#ifndef PULSAR_TABLEVIEW_CONFIGURATION_H_
+#define PULSAR_TABLEVIEW_CONFIGURATION_H_
 
-#include <google/protobuf/descriptor.h>
 #include <pulsar/Schema.h>
+#include <pulsar/defines.h>
 
 namespace pulsar {
 
-/**
- * Create a protobuf native schema using a descriptor.
- *
- * @param descriptor the Descriptor object of the target class
- * @return the protobuf native schema
- * @throw std::invalid_argument if descriptor is nullptr
- */
-PULSAR_PUBLIC SchemaInfo createProtobufNativeSchema(const google::protobuf::Descriptor* descriptor);
-
+struct TableViewConfiguration {
+    // Declare the schema of the data that this table view will be accepting.
+    // The schema will be checked against the schema of the topic, and the
+    // table view creation will fail if it's not compatible.
+    SchemaInfo schemaInfo;
+    // The name of the subscription to the topic. Default value is reader-{random string}.
+    std::string subscriptionName;
+};
 }  // namespace pulsar
+#endif /* PULSAR_TABLEVIEW_CONFIGURATION_H_ */

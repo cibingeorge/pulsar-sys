@@ -19,19 +19,29 @@
 
 #pragma once
 
-#include <pulsar/c/message.h>
 #include <pulsar/defines.h>
+
+#include "producer_configuration.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct _pulsar_topic_metadata pulsar_topic_metadata_t;
+typedef struct _pulsar_table_view_configuration pulsar_table_view_configuration_t;
 
-typedef int (*pulsar_message_router)(pulsar_message_t *msg, pulsar_topic_metadata_t *topicMetadata,
-                                     void *ctx);
+PULSAR_PUBLIC pulsar_table_view_configuration_t *pulsar_table_view_configuration_create();
 
-PULSAR_PUBLIC int pulsar_topic_metadata_get_num_partitions(pulsar_topic_metadata_t *topicMetadata);
+PULSAR_PUBLIC void pulsar_table_view_configuration_free(pulsar_table_view_configuration_t *conf);
+
+PULSAR_PUBLIC void pulsar_table_view_configuration_set_schema_info(
+    pulsar_table_view_configuration_t *table_view_configuration_t, pulsar_schema_type schemaType,
+    const char *name, const char *schema, pulsar_string_map_t *properties);
+
+PULSAR_PUBLIC void pulsar_table_view_configuration_set_subscription_name(
+    pulsar_table_view_configuration_t *table_view_configuration_t, const char *subscription_name);
+
+PULSAR_PUBLIC const char *pulsar_table_view_configuration_get_subscription_name(
+    pulsar_table_view_configuration_t *table_view_configuration_t);
 
 #ifdef __cplusplus
 }

@@ -20,15 +20,31 @@
 #pragma once
 
 #include <pulsar/defines.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef enum { pulsar_DEBUG = 0, pulsar_INFO = 1, pulsar_WARN = 2, pulsar_ERROR = 3 } pulsar_logger_level_t;
+typedef enum
+{
+    pulsar_DEBUG = 0,
+    pulsar_INFO = 1,
+    pulsar_WARN = 2,
+    pulsar_ERROR = 3
+} pulsar_logger_level_t;
 
 typedef void (*pulsar_logger)(pulsar_logger_level_t level, const char *file, int line, const char *message,
                               void *ctx);
+
+typedef struct pulsar_logger_t {
+    // The context that will be passed into `is_enabled` and `log` as the last argument
+    void *ctx;
+    // Whether to log for the given log level
+    bool (*is_enabled)(pulsar_logger_level_t level, void *ctx);
+    // How to log the message
+    pulsar_logger log;
+} pulsar_logger_t;
 
 typedef struct _pulsar_client_configuration pulsar_client_configuration_t;
 typedef struct _pulsar_authentication pulsar_authentication_t;
@@ -128,6 +144,9 @@ PULSAR_PUBLIC int pulsar_client_configuration_get_concurrent_lookup_request(
 PULSAR_PUBLIC void pulsar_client_configuration_set_logger(pulsar_client_configuration_t *conf,
                                                           pulsar_logger logger, void *ctx);
 
+PULSAR_PUBLIC void pulsar_client_configuration_set_logger_t(pulsar_client_configuration_t *conf,
+                                                            pulsar_logger_t logger);
+
 PULSAR_PUBLIC void pulsar_client_configuration_set_use_tls(pulsar_client_configuration_t *conf, int useTls);
 
 PULSAR_PUBLIC int pulsar_client_configuration_is_use_tls(pulsar_client_configuration_t *conf);
@@ -140,6 +159,18 @@ PULSAR_PUBLIC const char *pulsar_client_configuration_get_tls_trust_certs_file_p
 
 PULSAR_PUBLIC void pulsar_client_configuration_set_tls_allow_insecure_connection(
     pulsar_client_configuration_t *conf, int allowInsecure);
+
+PULSAR_PUBLIC void pulsar_client_configuration_set_tls_private_key_file_path(
+    pulsar_client_configuration_t *conf, const char *private_key_file_path);
+
+PULSAR_PUBLIC const char *pulsar_client_configuration_get_tls_private_key_file_path(
+    pulsar_client_configuration_t *conf);
+
+PULSAR_PUBLIC void pulsar_client_configuration_set_tls_certificate_file_path(
+    pulsar_client_configuration_t *conf, const char *certificateFilePath);
+
+PULSAR_PUBLIC const char *pulsar_client_configuration_get_tls_certificate_file_path(
+    pulsar_client_configuration_t *conf);
 
 PULSAR_PUBLIC int pulsar_client_configuration_is_tls_allow_insecure_connection(
     pulsar_client_configuration_t *conf);

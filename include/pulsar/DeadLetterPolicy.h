@@ -16,22 +16,56 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#ifndef DEPRECATED_EXCEPTION_HPP_
-#define DEPRECATED_EXCEPTION_HPP_
+#ifndef DEAD_LETTER_POLICY_HPP_
+#define DEAD_LETTER_POLICY_HPP_
 
 #include <pulsar/defines.h>
 
-#include <stdexcept>
+#include <memory>
 #include <string>
 
 namespace pulsar {
-class PULSAR_PUBLIC DeprecatedException : public std::runtime_error {
+
+struct DeadLetterPolicyImpl;
+
+/**
+ * Configuration for the "dead letter queue" feature in consumer.
+ *
+ * see @DeadLetterPolicyBuilder
+ */
+class PULSAR_PUBLIC DeadLetterPolicy {
    public:
-    explicit DeprecatedException(const std::string& __arg);
+    DeadLetterPolicy();
+
+    /**
+     * Get dead letter topic
+     *
+     * @return
+     */
+    const std::string& getDeadLetterTopic() const;
+
+    /**
+     * Get max redeliver count
+     *
+     * @return
+     */
+    int getMaxRedeliverCount() const;
+
+    /**
+     * Get initial subscription name
+     *
+     * @return
+     */
+    const std::string& getInitialSubscriptionName() const;
 
    private:
-    static const std::string message_prefix;
+    friend class DeadLetterPolicyBuilder;
+
+    typedef std::shared_ptr<DeadLetterPolicyImpl> DeadLetterPolicyImplPtr;
+    DeadLetterPolicyImplPtr impl_;
+
+    explicit DeadLetterPolicy(const DeadLetterPolicyImplPtr& impl);
 };
 }  // namespace pulsar
 
-#endif  // DEPRECATED_EXCEPTION_HPP_
+#endif /* DEAD_LETTER_POLICY_HPP_ */

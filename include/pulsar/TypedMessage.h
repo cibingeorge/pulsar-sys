@@ -18,18 +18,32 @@
  */
 #pragma once
 
-#include <google/protobuf/descriptor.h>
-#include <pulsar/Schema.h>
+#include <pulsar/Message.h>
+
+#include <functional>
 
 namespace pulsar {
 
-/**
- * Create a protobuf native schema using a descriptor.
- *
- * @param descriptor the Descriptor object of the target class
- * @return the protobuf native schema
- * @throw std::invalid_argument if descriptor is nullptr
- */
-PULSAR_PUBLIC SchemaInfo createProtobufNativeSchema(const google::protobuf::Descriptor* descriptor);
+template <typename T>
+class TypedMessage : public Message {
+   public:
+    using Decoder = std::function<T(const char*, std::size_t)>;
+
+    TypedMessage() = default;
+
+    TypedMessage(
+        const Message& message, Decoder decoder = [](const char*, std::size_t) { return T{}; })
+        : Message(message), decoder_(decoder) {}
+
+    T getValue() const { return decoder_(static_cast<const char*>(getData()), getLength()); }
+
+    TypedMessage& setDecoder(Decoder decoder) {
+        decoder_ = decoder;
+        return *this;
+    }
+
+   private:
+    Decoder decoder_;
+};
 
 }  // namespace pulsar

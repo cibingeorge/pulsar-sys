@@ -16,20 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#pragma once
-
-#include <google/protobuf/descriptor.h>
-#include <pulsar/Schema.h>
+#ifndef PULSAR_CPP_REGEX_SUB_MODE_H
+#define PULSAR_CPP_REGEX_SUB_MODE_H
 
 namespace pulsar {
+enum RegexSubscriptionMode
+{
+    /**
+     * Only subscribe to persistent topics.
+     */
+    PersistentOnly = 0,
 
-/**
- * Create a protobuf native schema using a descriptor.
- *
- * @param descriptor the Descriptor object of the target class
- * @return the protobuf native schema
- * @throw std::invalid_argument if descriptor is nullptr
- */
-PULSAR_PUBLIC SchemaInfo createProtobufNativeSchema(const google::protobuf::Descriptor* descriptor);
+    /**
+     * Only subscribe to non-persistent topics.
+     */
+    NonPersistentOnly = 1,
 
-}  // namespace pulsar
+    /**
+     * Subscribe to both persistent and non-persistent topics.
+     */
+    AllTopics = 2
+};
+}
+
+#endif  // PULSAR_CPP_REGEX_SUB_MODE_H

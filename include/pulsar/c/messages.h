@@ -16,42 +16,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 #pragma once
+
+#include <pulsar/c/message.h>
+#include <pulsar/defines.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <pulsar/defines.h>
-#include <stddef.h>
-#include <stdint.h>
-
-typedef struct _pulsar_message_id pulsar_message_id_t;
+typedef struct _pulsar_messages pulsar_messages_t;
 
 /**
- * MessageId representing the "earliest" or "oldest available" message stored in the topic
+ * Get the number of messages.
+ *
+ * NOTE: Undefined behavior will happen if `msgs` is NULL.
  */
-PULSAR_PUBLIC const pulsar_message_id_t *pulsar_message_id_earliest();
+PULSAR_PUBLIC size_t pulsar_messages_size(pulsar_messages_t* msgs);
 
 /**
- * MessageId representing the "latest" or "last published" message in the topic
+ * Get the Nth message according to the given index.
+ *
+ * NOTE:
+ * 1. You should not free the returned pointer, which always points to a valid memory unless `msgs` is freed.
+ * 2. Undefined behavior will happen if `msgs` is NULL or `index` is not smaller than the number of messages.
  */
-PULSAR_PUBLIC const pulsar_message_id_t *pulsar_message_id_latest();
+PULSAR_PUBLIC pulsar_message_t* pulsar_messages_get(pulsar_messages_t* msgs, size_t index);
 
-/**
- * Serialize the message id into a binary string for storing
- */
-PULSAR_PUBLIC void *pulsar_message_id_serialize(pulsar_message_id_t *messageId, int *len);
-
-/**
- * Deserialize a message id from a binary string
- */
-PULSAR_PUBLIC pulsar_message_id_t *pulsar_message_id_deserialize(const void *buffer, uint32_t len);
-
-PULSAR_PUBLIC char *pulsar_message_id_str(pulsar_message_id_t *messageId);
-
-PULSAR_PUBLIC void pulsar_message_id_free(pulsar_message_id_t *messageId);
+PULSAR_PUBLIC void pulsar_messages_free(pulsar_messages_t* msgs);
 
 #ifdef __cplusplus
 }

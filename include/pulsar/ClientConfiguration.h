@@ -19,9 +19,9 @@
 #ifndef PULSAR_CLIENTCONFIGURATION_H_
 #define PULSAR_CLIENTCONFIGURATION_H_
 
-#include <pulsar/defines.h>
 #include <pulsar/Authentication.h>
 #include <pulsar/Logger.h>
+#include <pulsar/defines.h>
 
 namespace pulsar {
 class PulsarWrapper;
@@ -45,6 +45,21 @@ class PULSAR_PUBLIC ClientConfiguration {
      * @return the client memory limit in bytes
      */
     uint64_t getMemoryLimit() const;
+
+    /**
+     * Sets the max number of connection that the client library will open to a single broker.
+     * By default, the connection pool will use a single connection for all the producers and consumers.
+     * Increasing this parameter may improve throughput when using many producers over a high latency
+     * connection.
+     *
+     * @param connectionsPerBroker max number of connections per broker (needs to be greater than 0)
+     */
+    ClientConfiguration& setConnectionsPerBroker(int connectionsPerBroker);
+
+    /**
+     * @return the max number of connection that the client library will open to a single broker
+     */
+    int getConnectionsPerBroker() const;
 
     /**
      * Set the authentication method to be used with the broker
@@ -117,17 +132,43 @@ class PULSAR_PUBLIC ClientConfiguration {
     int getConcurrentLookupRequest() const;
 
     /**
-     * Initialize the log configuration
+     * Max number of lookup redirection allowed on each look request to prevent overload on broker.
+     * <i>(default: 20)</i>
      *
-     * @param logConfFilePath  path of the configuration file
-     * @deprecated
+     * @param maxLookupRedirects
      */
-    ClientConfiguration& setLogConfFilePath(const std::string& logConfFilePath);
+    ClientConfiguration& setMaxLookupRedirects(int maxLookupRedirects);
 
     /**
-     * Get the path of log configuration file (log4cpp)
+     * @return Get configured total allowed lookup redirecting.
      */
-    const std::string& getLogConfFilePath() const;
+    int getMaxLookupRedirects() const;
+
+    /**
+     * Initial backoff interval in milliseconds.
+     * <i>(default: 100)</i>
+     *
+     * @param initialBackoffIntervalMs
+     */
+    ClientConfiguration& setInitialBackoffIntervalMs(int initialBackoffIntervalMs);
+
+    /**
+     * @return Get initial backoff interval in milliseconds.
+     */
+    int getInitialBackoffIntervalMs() const;
+
+    /**
+     * Max backoff interval in milliseconds.
+     * <i>(default: 60000)</i>
+     *
+     * @param maxBackoffIntervalMs
+     */
+    ClientConfiguration& setMaxBackoffIntervalMs(int maxBackoffIntervalMs);
+
+    /**
+     * @return Get max backoff interval in milliseconds.
+     */
+    int getMaxBackoffIntervalMs() const;
 
     /**
      * Configure a custom logger backend to route of Pulsar client library
@@ -155,6 +196,30 @@ class PULSAR_PUBLIC ClientConfiguration {
      * @return whether the TLS encryption is used on the connections
      */
     bool isUseTls() const;
+
+    /**
+     * Set the path to the TLS private key file.
+     *
+     * @param tlsPrivateKeyFilePath
+     */
+    ClientConfiguration& setTlsPrivateKeyFilePath(const std::string& tlsKeyFilePath);
+
+    /**
+     * @return the path to the TLS private key file
+     */
+    const std::string& getTlsPrivateKeyFilePath() const;
+
+    /**
+     * Set the path to the TLS certificate file.
+     *
+     * @param tlsCertificateFilePath
+     */
+    ClientConfiguration& setTlsCertificateFilePath(const std::string& tlsCertificateFilePath);
+
+    /**
+     * @return the path to the TLS certificate file
+     */
+    const std::string& getTlsCertificateFilePath() const;
 
     /**
      * Set the path to the trusted TLS certificate file.
@@ -266,6 +331,42 @@ class PULSAR_PUBLIC ClientConfiguration {
    private:
     const AuthenticationPtr& getAuthPtr() const;
     std::shared_ptr<ClientConfigurationImpl> impl_;
+
+    // By default, when the client connects to the broker, a version string like "Pulsar-CPP-v<x.y.z>" will be
+    // carried and saved by the broker. The client version string could be queried from the topic stats.
+    //
+    // This method provides a way to add more description to a specific `Client` instance. If it's configured,
+    // the description will be appended to the original client version string, with '-' as the separator.
+    //
+    // For example, if the client version is 3.2.0, and the description is "forked", the final client version
+    // string will be "Pulsar-CPP-v3.2.0-forked".
+    //
+    // NOTE: This method should only be called by the PulsarWrapper and the length should not exceed 64.
+    //
+    // For example, you can add a PulsarWrapper class like:
+    //
+    // ```c++
+    // namespace pulsar {
+    // class PulsarWrapper {
+    //     static ClientConfiguration clientConfig() {
+    //         ClientConfiguration conf;
+    //         conf.setDescription("forked");
+    //         return conf;
+    //     }
+    // };
+    // }
+    // ```
+    //
+    // Then, call the method before passing the `conf` to the constructor of `Client`:
+    //
+    // ```c++
+    // auto conf = PulsarWrapper::clientConfig();
+    // // Set other attributes of `conf` here...
+    // Client client{"pulsar://localhost:6650", conf);
+    // ```
+    ClientConfiguration& setDescription(const std::string& description);
+
+    const std::string& getDescription() const noexcept;
 };
 }  // namespace pulsar
 

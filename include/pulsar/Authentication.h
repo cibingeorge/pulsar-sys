@@ -19,13 +19,14 @@
 #ifndef PULSAR_AUTHENTICATION_H_
 #define PULSAR_AUTHENTICATION_H_
 
+#include <pulsar/Result.h>
 #include <pulsar/defines.h>
-#include <vector>
-#include <string>
+
+#include <functional>
 #include <map>
 #include <memory>
-#include <pulsar/Result.h>
-#include <functional>
+#include <string>
+#include <vector>
 
 namespace pulsar {
 
@@ -291,6 +292,58 @@ class PULSAR_PUBLIC AuthToken : public Authentication {
 
    private:
     AuthenticationDataPtr authDataToken_;
+};
+
+/**
+ * Basic based implementation of Pulsar client authentication
+ */
+class PULSAR_PUBLIC AuthBasic : public Authentication {
+   public:
+    explicit AuthBasic(AuthenticationDataPtr&);
+    ~AuthBasic() override;
+
+    /**
+     * Create an AuthBasic with a ParamMap
+     *
+     * It is equal to create(params[“username”], params[“password”])
+     * @see create(const std::string&, const std::string&)
+     */
+    static AuthenticationPtr create(ParamMap& params);
+
+    /**
+     * Create an AuthBasic with an authentication parameter string
+     *
+     * @param authParamsString the JSON format string: {"username": "admin", "password": "123456"}
+     */
+    static AuthenticationPtr create(const std::string& authParamsString);
+
+    /**
+     * Create an AuthBasic with the required parameters
+     */
+    static AuthenticationPtr create(const std::string& username, const std::string& password);
+
+    /**
+     * Create an AuthBasic with the required parameters
+     */
+    static AuthenticationPtr create(const std::string& username, const std::string& password,
+                                    const std::string& method);
+
+    /**
+     * @return “basic”
+     */
+    const std::string getAuthMethodName() const override;
+
+    /**
+     * Get AuthenticationData from the current instance
+     *
+     * @param[out] authDataBasic the shared pointer of AuthenticationData. The content of AuthenticationData
+     * is changed to the internal data of the current instance.
+     * @return ResultOk
+     */
+    Result getAuthData(AuthenticationDataPtr& authDataBasic) override;
+
+   private:
+    AuthenticationDataPtr authDataBasic_;
 };
 
 /**

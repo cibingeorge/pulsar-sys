@@ -2,6 +2,6 @@
 export $(cat .env | xargs)
 
 rm -rf include
-curl -Ls "https://archive.apache.org/dist/pulsar/pulsar-$PULSAR_VERSION/apache-pulsar-$PULSAR_VERSION-src.tar.gz" | tar -zxvf - "apache-pulsar-$PULSAR_VERSION-src/pulsar-client-cpp/include"
-mv "apache-pulsar-$PULSAR_VERSION-src/pulsar-client-cpp/include" .
-rm -rf "apache-pulsar-$PULSAR_VERSION-src"
+curl -Ls "https://github.com/apache/pulsar-client-cpp/archive/refs/tags/v$PULSAR_CPP_VERSION.tar.gz" | tar -zxvf - "pulsar-client-cpp-$PULSAR_CPP_VERSION/include"
+mv "pulsar-client-cpp-$PULSAR_CPP_VERSION/include" .
+rm -rf "pulsar-client-cpp-$PULSAR_CPP_VERSION"
